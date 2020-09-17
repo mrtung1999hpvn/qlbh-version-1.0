@@ -1,0 +1,2 @@
+(this["webpackJsonpqlbh-version-1"]=this["webpackJsonpqlbh-version-1"]||[]).push([[7],{583:function(e,t,n){"use strict";n.r(t),n.d(t,"default",(function(){return r}));var i=n(0),a=n.n(i),s=n(10);function r(){return a.a.createElement(i.Fragment,null,a.a.createElement(s.e,{titleHeading:"Default",titleDescription:"This is a dashboard page example built using this template."}))}}}]);
+//# sourceMappingURL=7.e4288fa5.chunk.js.map
