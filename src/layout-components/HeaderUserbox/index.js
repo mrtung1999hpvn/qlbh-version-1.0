@@ -90,10 +90,10 @@ export default function HeaderUserbox() {
             <ListItem
               button
               onClick={async () => {
-                window.localStorage.setItem(_3DES.encrypt(key,'user'),_3DES.encrypt(key,'ABSoft'))
-                window.localStorage.setItem(_3DES.encrypt(key,'pass'),_3DES.encrypt(key,'ABSoft'))
+                window.localStorage.setItem('key',false)
+                window.location ="/btl_CloudImage"
               }}>
-              <a href="/">Thoát</a>
+              <a href="/btl_CloudImage">Thoát</a>
             </ListItem>
 
             <Divider className="w-100" />

@@ -1,63 +1,77 @@
-import React, { Fragment, useState,useRef } from 'react';
+import React, { Fragment, useState, useRef } from 'react';
 import img from '../assets/images/Web-app/Logo.png';
 import host from '../hosting/host';
-import LoadDing from '../assets/css/Load/Load'
-const _3DES = require('nodejs3des')
-const date = new Date()
-const key = date.getDay()+"-"+(date.getMonth()+1)+"-"+date.getFullYear()
+import LoadDing from '../assets/css/Load/Load';
+
+const _3DES = require('nodejs3des');
+const date = new Date();
+const key =
+  date.getDay() + '-' + (date.getMonth() + 1) + '-' + date.getFullYear();
 function Login() {
-  const typingTimeoutRef = useRef(null)
-  const [User, setUser] = useLocalStorage(_3DES.encrypt(key,'user'),'Mặc định');
-  const [Pass, setPass] = useLocalStorage(_3DES.encrypt(key,'pass'),'Mặc định');
-  const [Loader,ShowLoader,HideLoader] = LoadDing()
+  const typingTimeoutRef = useRef(null);
+  const [User, setUser] = useLocalStorage(
+    _3DES.encrypt(key, 'user'),
+    'Mặc định'
+  );
+  const [Pass, setPass] = useLocalStorage(
+    _3DES.encrypt(key, 'pass'),
+    'Mặc định'
+  );
+  const [Loader, ShowLoader, HideLoader] = LoadDing();
   const [TaiKhoan, SetTaiKhoan] = useState([]);
   const [MatKhau, SetMatKhau] = useState([]);
   const OnLoginForm = async () => {
     try {
-      if(typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current) 
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
       }
-      ShowLoader()
-      typingTimeoutRef.current = setTimeout(async ()=>
-      {
-      if (TaiKhoan.length === 0 || MatKhau.length === 0) {
-        alert('Bạn chưa nhập tài khoản mật khẩu !');
-        console.log('false');
-        HideLoader()
-      } 
-      if(!/^[A-Za-z0-9]*$/.test(TaiKhoan) && !/^[A-Za-z0-9]*$/.test(MatKhau))
-      {
-        alert('Bạn nhập sai dữ liệu tài khoản & mật khẩu !');
-        console.log(User+" "+Pass)
-        HideLoader()
-      } else {
-        const response = await fetch(
-          host.nguoidung + `/${TaiKhoan}/${MatKhau}`
-        );
-        const JsonData = await response.json();
+      ShowLoader();
+      typingTimeoutRef.current = setTimeout(async () => {
+        if (TaiKhoan.length === 0 || MatKhau.length === 0) {
+          alert('Bạn chưa nhập tài khoản mật khẩu !');
+          console.log('false');
+          HideLoader();
+        }
+        if (
+          !/^[A-Za-z0-9]*$/.test(TaiKhoan) &&
+          !/^[A-Za-z0-9]*$/.test(MatKhau)
+        ) {
+          alert('Bạn nhập sai dữ liệu tài khoản & mật khẩu !');
+          console.log(User + ' ' + Pass);
+          HideLoader();
+        } else {
+          const response = await fetch(
+            host.nguoidung + `/${TaiKhoan}/${MatKhau}`
+          );
+          const JsonData = await response.json();
 
           if (JsonData.length === 0) {
             alert('Đăng nhập thất bại !');
             console.log('false');
-            setPass("ABCXYZ")
-            window.location.href = "/"
+            setPass('ABCXYZ');
+            window.location.href = '/';
           } else {
-
-            setUser(_3DES.encrypt(key,_3DES.encrypt(key,JsonData[0].ten_dang_nhap)))
-            setPass(_3DES.encrypt(key,_3DES.encrypt(key,"true"+JsonData[0].mat_khau)))
-            alert('Đăng nhập thành công !')
-            window.location.href = "/"
-            console.log('true')
+            setUser(
+              _3DES.encrypt(key, _3DES.encrypt(key, JsonData[0].ten_dang_nhap))
+            );
+            setPass(
+              _3DES.encrypt(
+                key,
+                _3DES.encrypt(key, 'true' + JsonData[0].mat_khau)
+              )
+            );
+            alert('Đăng nhập thành công !');
+            window.location.href = '/';
+            console.log('true');
           }
-          HideLoader()
-      }
-      
-    },1000)
+          HideLoader();
+        }
+      }, 1000);
     } catch (error) {
       console.error(error);
     }
   };
-  
+
   return (
     <Fragment>
       <div className="limiter">
@@ -78,8 +92,8 @@ function Login() {
                   type="text"
                   name="email"
                   placeholder="Tài khoản"
-                  onChange={e => SetTaiKhoan(e.target.value)}
-                  onKeyDown={e => {
+                  onChange={(e) => SetTaiKhoan(e.target.value)}
+                  onKeyDown={(e) => {
                     if (e.keyCode === 13) {
                       OnLoginForm();
                     }
@@ -98,8 +112,8 @@ function Login() {
                   type="password"
                   name="pass"
                   placeholder="Mật khẩu"
-                  onChange={e => SetMatKhau(e.target.value)}
-                  onKeyDown={e => {
+                  onChange={(e) => SetMatKhau(e.target.value)}
+                  onKeyDown={(e) => {
                     if (e.keyCode === 13) {
                       OnLoginForm();
                     }
@@ -112,8 +126,8 @@ function Login() {
               </div>
               <div className="container-login100-form-btn">
                 <button className="login100-form-btn" onClick={OnLoginForm}>
-                Đăng nhập
-                </button> 
+                  Đăng nhập
+                </button>
               </div>
               {/* <div className="text-center p-t-12">
           <span className="txt1">
@@ -156,7 +170,7 @@ function useLocalStorage(key, initialValue) {
 
   // Return a wrapped version of useState's setter function that ...
   // ... persists the new value to localStorage.
-  const setValue = value => {
+  const setValue = (value) => {
     try {
       // Allow value to be a function so we have same API as useState
       const valueToStore =

@@ -1,14 +1,14 @@
-import React , {useState,useEffect} from 'react';
+import React , {useState,useEffect,Fragment} from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import configureStore from './config/configureStore';
 import { Provider } from 'react-redux';
 import Routes from './Routes';
-import Routes_ from './Routes_WebBanHang';
 import ScrollToTop from './utils/ScrollToTop';
 import './assets/base.scss';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import host from './hosting/host'
 import { library } from '@fortawesome/fontawesome-svg-core';
+import LandingPage from './views/LandingPage/LandingPage'
 import {
   fab,
   faFacebook,
@@ -258,39 +258,27 @@ const date = new Date()
 const key = date.getDay()+"-"+(date.getMonth()+1)+"-"+date.getFullYear()
 const store = configureStore();
 function App() {
-  if(window.localStorage.getItem(_3DES.encrypt(key,'user'))===null)
-  {
-    window.localStorage.setItem(_3DES.encrypt(key,'user'),_3DES.encrypt(key,'ABSoft'))
-    window.localStorage.setItem(_3DES.encrypt(key,'pass'),_3DES.encrypt(key,'ABSoft'))
+  const [localStorageLogin,SetlocalStorageLogin] = useLocalStorage('key',false)
+  const [CheckLogin,SetCheckLogin]=useState(false)
+  const _onLogin = (e)=>{
+    console.log(e)
+    SetlocalStorageLogin(e)
+    SetCheckLogin(e)
+    window.localStorage.setItem('key',e)
+    window.location ="/btl_CloudImage"
   }
-  const [Connect,SetConnect] = useState([])
-  const getConnect = async ()=>{
-    try {
-        const response = await fetch(host.connect)
-        const JsonData = await response.json()
-        JsonData.length > 0 ?  SetConnect(true) : SetConnect(false)
-    } catch (error) {
-      console.error(error)
-      SetConnect(false)
-    }
-  }
-  useEffect(() => {
-    getConnect()
-  }, [])
-  // console.clear()
-  if(Connect)
+  console.log(window.localStorage.getItem('key'))
+  if(!localStorageLogin)
   {
-    if(_3DES.decrypt(key,
-      _3DES.decrypt(key,window.localStorage.getItem(_3DES.encrypt(key,'user'))
-      ))==="admin"
-    && _3DES.decrypt(key,_3DES.decrypt(key,
-      window.localStorage.getItem(_3DES.encrypt(key,'pass')).substring(1).substring(0,
-      window.localStorage.getItem(_3DES.encrypt(key,'pass')).length-2)
-    )).indexOf('true')
-      >=0
-      )
-    {
-      // alert('Adminator')
+    // alert('đănh xuất')
+    return (
+      <Fragment>
+          <LandingPage onLogin={_onLogin}></LandingPage>
+        </Fragment>
+    )
+  }
+  else {
+    // alert('đănh 12321xuất')
       return (
         <Provider store={store}>
         <BrowserRouter basename="/">
@@ -301,55 +289,42 @@ function App() {
         </BrowserRouter>
       </Provider>
       )
-    }
-    else if(
-      _3DES.decrypt(key,_3DES.decrypt(key,window.localStorage.getItem(_3DES.encrypt(key,'user'))
-      ))!=="admin"
-    && _3DES.decrypt(key,_3DES.decrypt(key,(
-      window.localStorage.getItem(_3DES.encrypt(key,'pass')).substring(1).substring(0,
-      window.localStorage.getItem(_3DES.encrypt(key,'pass')).length-2)
-    ))).indexOf('true')
-      >=0
-      )
-    {
-      alert('Member')
-      return (
-        <Provider store={store}>
-        <BrowserRouter basename="/">
-          <CssBaseline />
-          <ScrollToTop>
-            <Routes_ />
-          </ScrollToTop>
-        </BrowserRouter>
-      </Provider>
-      )
-    }else if(
-      !_3DES.decrypt(key,_3DES.decrypt(key,
-        window.localStorage.getItem(_3DES.encrypt(key,'pass')).substring(1).substring(0,
-        window.localStorage.getItem(_3DES.encrypt(key,'pass')).length-2)
-      )).indexOf('true') >=0
-    )
-    {
-      alert('User')
-      return (
-      <Provider store={store}>
-      <BrowserRouter basename="/">
-        <CssBaseline />
-        <ScrollToTop>
-          <Routes_ />
-        </ScrollToTop>
-      </BrowserRouter>
-    </Provider>
-      )
-    }
-  }else{
-    return (
-      <> 
-        <h1 style={{color:"black"}}>HTTP 404 NOT FOUND</h1>
-        <h4 style={{color:"black"}}>Can't not connect server</h4>
-      </>
-    )
   }
 }
+// Hook
+function useLocalStorage(key, initialValue) {
+  // State to store our value
+  // Pass initial state function to useState so logic is only executed once
+  const [storedValue, setStoredValue] = useState(() => {
+    try {
+      // Get from local storage by key
+      const item = window.localStorage.getItem(key);
+      // Parse stored json or if none return initialValue
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      // If error also return initialValue
+      console.log(error);
+      return initialValue;
+    }
+  });
 
+  // Return a wrapped version of useState's setter function that ...
+  // ... persists the new value to localStorage.
+  const setValue = value => {
+    try {
+      // Allow value to be a function so we have same API as useState
+      const valueToStore =
+        value instanceof Function ? value(storedValue) : value;
+      // Save state
+      setStoredValue(valueToStore);
+      // Save to local storage
+      window.localStorage.setItem(key, JSON.stringify(valueToStore));
+    } catch (error) {
+      // A more advanced implementation would handle the error case
+      console.log(error);
+    }
+  };
+
+  return [storedValue, setValue];
+}
 export default App
